@@ -166,6 +166,15 @@ type conn struct {
 	gss GSS
 }
 
+// Implement driver.SessionResetter to ignore connections marked as bad.
+func (cn *conn) ResetSession(_ context.Context) error {
+	if cn.getBad() {
+		return driver.ErrBadConn
+	}
+
+	return nil
+}
+
 // Handle driver-side settings in parsed connection string.
 func (cn *conn) handleDriverSettings(o values) (err error) {
 	boolSetting := func(key string, val *bool) error {
